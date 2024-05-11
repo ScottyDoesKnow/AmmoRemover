@@ -2,8 +2,8 @@
 A Fallout 4 F4SE (Fallout 4 Script Extender) mod which removes ammo from guns dropped by NPCs and puts it in their inventory, so you don't have to loot and then drop every gun to get all the ammo. I had some trouble getting everything set up to update my mod to the new F4SE 0.7.1, and an example like this would have made things a lot easier. Disclaimer: I don't have much experience with C++ and I mostly just messed around until everything worked, starting from [Ryan-rsm-McKenzie/ExamplePlugin-SKSE64](https://github.com/Ryan-rsm-McKenzie/ExamplePlugin-SKSE64).
 
 ### Requirements
-- Visual Studio 2022 (What I used, haven't tried other versions)
-- CMake 3.18 Minimum (I used 3.29.3)
+- Visual Studio (I used 2022, but I think anything 2013+ should work)
+- CMake 3.18+ (I used 3.29.3)
 
 ### Building
 1. Create an empty directory, open a Command Prompt window, navigate to it and run the following commands:
