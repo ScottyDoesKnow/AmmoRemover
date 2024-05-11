@@ -20,7 +20,7 @@ cmake --build f4se/build --config Release
 
 2. Open AmmoRemover\AmmoRemover.sln
 3. Set solution configuration to Release
-4. Build ALL_BUILD (may not be necessary)
+4. Build ALL_BUILD
 5. Build AmmoRemover
 6. AmmoRemover.dll should end up in <your directory>\AmmoRemover\x64\Release
 
