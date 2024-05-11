@@ -3,6 +3,7 @@ A Fallout 4 F4SE (Fallout 4 Script Extender) mod which removes ammo from guns dr
 
 ### Requirements
 - Visual Studio (I used 2022, but I think anything 2013+ should work)
+  - Desktop development with C++
 - CMake 3.18+ (I used 3.29.3)
 
 ### Building
@@ -18,7 +19,7 @@ cmake -B f4se/build -S f4se -DCMAKE_INSTALL_PREFIX=extern f4se
 cmake --build f4se/build --config Release
 ```
 
-2. Open AmmoRemover\AmmoRemover.sln
+2. Open \<your directory>\AmmoRemover\AmmoRemover.sln
 3. Set solution configuration to Release
 4. Build ALL_BUILD
 5. Build AmmoRemover
