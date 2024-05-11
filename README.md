@@ -22,7 +22,7 @@ cmake --build f4se/build --config Release
 3. Set solution configuration to Release
 4. Build ALL_BUILD
 5. Build AmmoRemover
-6. AmmoRemover.dll should end up in <your directory>\AmmoRemover\x64\Release
+6. AmmoRemover.dll should end up in \<your directory>\AmmoRemover\x64\Release
 
 ### Notes
 - You can enable the Post-Build Event for AmmoRemover and modify the path to have it copied to your Fallout 4 F4SE folder automatically for faster testing.
