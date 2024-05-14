@@ -14,8 +14,8 @@
 #include "version.h" // VERSION_VERSTRING, VERSION_MAJOR
 
 // These are needed!
-#include "f4se/GameAPI.cpp" // Heap_Allocate
-#include "f4se/GameRTTI.cpp" // DYNAMIC_CAST
+#include "f4se/GameAPI.cpp"   // Heap_Allocate
+#include "f4se/GameRTTI.cpp"  // DYNAMIC_CAST
 #include "f4se/GameTypes.cpp" // SimpleLock
 
 #define DEBUG 0
@@ -221,13 +221,13 @@ extern "C"
 	__declspec(dllexport) F4SEPluginVersionData F4SEPlugin_Version =
 	{
 		F4SEPluginVersionData::kVersion,
-		1100,
+		AMMO_REMOVER_VERSION_INT,
 		"AmmoRemover",
 		"ScottyDoesKnow",
-		0,                               // Not version independent (addresses)
-		0,                               // Not version independent (structs)
-		{ RUNTIME_VERSION_1_10_980, 0 }, // Compatible with 1.10.980
-		0,                               // Works with any version of the script extender. You probably do not need to put anything here.
+		0,                            // Not version independent (addresses)
+		0,                            // Not version independent (structs)
+		{ RUNTIME_COMPATIBILITY, 0 }, // Compatibility
+		0,                            // Works with any version of the script extender. You probably do not need to put anything here.
 	};
 
 	bool F4SEPlugin_Load(const F4SEInterface* f4se)
