@@ -58,6 +58,7 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="CustomMacros.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -110,21 +111,21 @@
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;../f4se/build/f4se/Release/f4se_1_10_984.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>echo F|copy /Y "$(ProjectDir)\AmmoRemoverDefaults.ini" "$(TargetDir)AmmoRemoverDefaults.ini"</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>echo F|xcopy /Y "$(TargetDir)$(ProjectName).dll" "G:\SteamLibrary\steamapps\common\Fallout 4\Data\F4SE\Plugins\$(ProjectName).dll"</Command>
+      <Command>echo F|copy /Y "$(TargetDir)$(ProjectName).dll" "$(FalloutDir)Data\F4SE\Plugins\$(ProjectName).dll"
+echo F|copy /Y "$(TargetDir)AmmoRemoverDefaults.ini" "$(FalloutDir)Data\F4SE\Plugins\AmmoRemoverDefaults.ini"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>
@@ -155,7 +156,7 @@
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;../f4se/build/f4se/Release/f4se_1_10_984.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -163,15 +164,15 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>echo F|copy /Y "$(ProjectDir)\AmmoRemoverDefaults.ini" "$(TargetDir)AmmoRemoverDefaults.ini"</Command>
       <Message>
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Message>
       </Message>
-      <Command>echo F|xcopy /Y "$(TargetDir)$(ProjectName).dll" "G:\SteamLibrary\steamapps\common\Fallout 4\Data\F4SE\Plugins\$(ProjectName).dll"</Command>
+      <Command>echo F|copy /Y "$(TargetDir)$(ProjectName).dll" "$(FalloutDir)Data\F4SE\Plugins\$(ProjectName).dll"
+echo F|copy /Y "$(TargetDir)AmmoRemoverDefaults.ini" "$(FalloutDir)Data\F4SE\Plugins\AmmoRemoverDefaults.ini"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
@@ -199,20 +200,20 @@
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;../f4se/build/f4se/Release/f4se_1_10_984.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>echo F|copy /Y "$(ProjectDir)\AmmoRemoverDefaults.ini" "$(TargetDir)AmmoRemoverDefaults.ini"</Command>
       <Message>
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Message>
       </Message>
-      <Command>echo F|xcopy /Y "$(TargetDir)$(ProjectName).dll" "G:\SteamLibrary\steamapps\common\Fallout 4\Data\F4SE\Plugins\$(ProjectName).dll"</Command>
+      <Command>echo F|copy /Y "$(TargetDir)$(ProjectName).dll" "$(FalloutDir)Data\F4SE\Plugins\$(ProjectName).dll"
+echo F|copy /Y "$(TargetDir)AmmoRemoverDefaults.ini" "$(FalloutDir)Data\F4SE\Plugins\AmmoRemoverDefaults.ini"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
@@ -239,29 +240,36 @@
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;../f4se/build/f4se/Release/f4se_1_10_984.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>echo F|copy /Y "$(ProjectDir)\AmmoRemoverDefaults.ini" "$(TargetDir)AmmoRemoverDefaults.ini"</Command>
       <Message>
       </Message>
     </PreBuildEvent>
     <PostBuildEvent>
       <Message>
       </Message>
-      <Command>echo F|xcopy /Y "$(TargetDir)$(ProjectName).dll" "G:\SteamLibrary\steamapps\common\Fallout 4\Data\F4SE\Plugins\$(ProjectName).dll"</Command>
+      <Command>echo F|copy /Y "$(TargetDir)$(ProjectName).dll" "$(FalloutDir)Data\F4SE\Plugins\$(ProjectName).dll"
+echo F|copy /Y "$(TargetDir)AmmoRemoverDefaults.ini" "$(FalloutDir)Data\F4SE\Plugins\AmmoRemoverDefaults.ini"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Config.cpp" />
+    <ClCompile Include="src\Logger.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\TESDeathEventHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Config.h" />
+    <ClInclude Include="include\INIReader.h" />
+    <ClInclude Include="include\Logger.h" />
+    <ClInclude Include="include\TESDeathEventHandler.h" />
     <ClInclude Include="include\version.h" />
   </ItemGroup>
   <ItemGroup>

@@ -12,11 +12,32 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Config.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
     <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TESDeathEventHandler.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Config.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\INIReader.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Logger.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TESDeathEventHandler.h">
+      <Filter>include</Filter>
+    </ClInclude>
     <ClInclude Include="include\version.h">
       <Filter>include</Filter>
     </ClInclude>
