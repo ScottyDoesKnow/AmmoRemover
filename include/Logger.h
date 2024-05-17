@@ -17,11 +17,14 @@ public:
 
 	static void Initialize();
 	static void Log(LogLevel level, const char* format, ...);
-	static void Log(LogLevel level, const char* method, const char* format, ...);
+	static void LogP(LogLevel level, const char* prefix, const char* format, ...);
 
 protected:
 	static IDebugLog::LogLevel Convert(LogLevel level)
 	{
 		return static_cast<IDebugLog::LogLevel>(level);
 	}
+
+private:
+	static void LogInternal(LogLevel level, const char* prefix, const char* format, va_list args);
 };

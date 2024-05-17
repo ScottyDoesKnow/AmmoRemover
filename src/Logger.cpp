@@ -30,29 +30,37 @@ void Logger::Log(const LogLevel level, const char* format, ...)
 
 	va_list args;
 	va_start(args, format);
-	Log(level, nullptr, format, args);
+	LogInternal(level, nullptr, format, args);
 	va_end(args);
 }
 
 
-void Logger::Log(const LogLevel level, const char* method, const char* format, ...)
+void Logger::LogP(const LogLevel level, const char* prefix, const char* format, ...)
 {
 	if (level > logLevel)
 		return;
 
-	const UInt8 levelVal = static_cast<UInt8>(level);
-
-	const size_t length = strlen(PREFIX[levelVal]) + (method != nullptr ? strlen(method) : 0) + strlen(format) + 1;
-	const auto output = new char[length];
-	strcpy_s(output, length, PREFIX[levelVal]);
-	if (method != nullptr)
-		strcat_s(output, length, method);
-	strcat_s(output, length, format);
-
 	va_list args;
 	va_start(args, format);
-	IDebugLog::Log(Convert(level), output, args);
+	LogInternal(level, prefix, format, args);
 	va_end(args);
+}
+
+void Logger::LogInternal(const LogLevel level, const char* prefix, const char* format, const va_list args)
+{
+	const UInt8 levelVal = static_cast<UInt8>(level);
+
+	const size_t length = strlen(PREFIX[levelVal]) + (prefix != nullptr ? strlen(prefix) : 0) + strlen(format) + 1;
+	const auto output = new char[length];
+	strcpy_s(output, length, PREFIX[levelVal]);
+	if (prefix != nullptr)
+		strcat_s(output, length, prefix);
+	strcat_s(output, length, format);
+
+	va_list argsCopy;
+	va_copy(argsCopy, args);
+	IDebugLog::Log(Convert(level), output, argsCopy);
+	va_end(argsCopy);
 
 	delete[] output;
 }
