@@ -65,11 +65,11 @@ extern "C"
 				TESDeathEventHandler::ammoPercent);
 			break;
 		case Config::ConfigFile:
-			Logger::Log(Logger::Message, "Loaded %li%% Ammo Percent.", ammoPercent);
+			Logger::Log(Logger::Message, "Loaded %li%% Ammo Percent.", TESDeathEventHandler::ammoPercent);
 			break;
 		case Config::Defaults:
-			Logger::Log(Logger::Warning, "Failed to load AmmoRemover.ini, loaded %li%% Ammo Percent from AmmoRemoverDefaults.ini",
-				ammoPercent);
+			Logger::Log(Logger::Warning, "Failed to load %sAmmoRemover.ini, loaded %li%% Ammo Percent from AmmoRemoverDefaults.ini",
+				TESDeathEventHandler::ammoPercent == 0 ? "True" : "", TESDeathEventHandler::ammoPercent);
 			break;
 		}
 

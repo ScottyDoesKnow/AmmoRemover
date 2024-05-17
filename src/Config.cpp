@@ -8,44 +8,43 @@
 
 static constexpr char DEFAULT_CONFIG_PATH[] = R"(\AmmoRemoverDefaults.ini)";
 static constexpr char CONFIG_PATH[] = R"(\My Games\Fallout4\F4SE\AmmoRemover.ini)";
+static constexpr char CONFIG_PATH_TRUE[] = R"(\My Games\Fallout4\F4SE\TrueAmmoRemover.ini)";
 
 static constexpr SInt32 AMMO_PERCENT_MAX = 1000;
 
 Config::InitializeResult Config::Initialize(SInt32& ammoPercent, Logger::LogLevel& logLevel)
 {
-	char configPath[MAX_PATH];
-	if (!GetPath(configPath, MAX_PATH))
+	char defaultConfigPath[MAX_PATH];
+	if (!GetLocalPath(defaultConfigPath, MAX_PATH, DEFAULT_CONFIG_PATH) || !Load(defaultConfigPath, ammoPercent, logLevel))
 		return Failed;
 
-	if (!Exists(configPath) || !Load(configPath, ammoPercent, logLevel))
-	{
-		char defaultConfigPath[MAX_PATH];
-		if (!GetDefaultPath(defaultConfigPath, MAX_PATH))
-			return Failed;
+	char configPath[MAX_PATH];
+	if (!GetDocumentsPath(configPath, MAX_PATH, ammoPercent == 0 ? CONFIG_PATH_TRUE : CONFIG_PATH))
+		return Defaults;
 
-		if (!Copy(defaultConfigPath, configPath) || !Load(configPath, ammoPercent, logLevel))
-		{
-			if (Load(defaultConfigPath, ammoPercent, logLevel))
-				return Defaults;
+	if (Exists(configPath) && Load(configPath, ammoPercent, logLevel))
+		return ConfigFile;
 
-			return Failed;
-		}
-	}
+	if (Copy(defaultConfigPath, configPath) && Load(configPath, ammoPercent, logLevel))
+		return ConfigFile;
 
-	return ConfigFile;
+	if (Load(defaultConfigPath, ammoPercent, logLevel))
+		return Defaults;
+
+	return Failed;
 }
 
-bool Config::GetPath(char* path, const rsize_t pathSize)
+bool Config::GetDocumentsPath(char* path, const rsize_t pathSize, const char* relativePath)
 {
 	const HRESULT error = SHGetFolderPath(nullptr, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE,
 		nullptr, SHGFP_TYPE_CURRENT, path);
 	if (FAILED(error))
 		return false;
 
-	if (strlen(path) + strlen(CONFIG_PATH) > pathSize)
+	if (strlen(path) + strlen(relativePath) > pathSize)
 		return false;
 
-	strcat_s(path, pathSize, CONFIG_PATH);
+	strcat_s(path, pathSize, relativePath);
 	return true;
 }
 
@@ -79,21 +78,21 @@ bool Config::Load(const char* path, SInt32& ammoPercent, Logger::LogLevel& logLe
 	return true;
 }
 
-bool Config::GetDefaultPath(char* path, const rsize_t pathSize)
+bool Config::GetLocalPath(char* path, const rsize_t pathSize, const char* relativePath)
 {
 	HMODULE hModule;
 	if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-		reinterpret_cast<LPCSTR>(&GetDefaultPath), &hModule)
+		reinterpret_cast<LPCSTR>(&GetLocalPath), &hModule)
 		|| !GetModuleFileName(hModule, path, MAX_PATH)
 		|| !PathRemoveFileSpec(path))
 	{
 		return false;
 	}
 
-	if (strlen(path) + strlen(DEFAULT_CONFIG_PATH) > pathSize)
+	if (strlen(path) + strlen(relativePath) > pathSize)
 		return false;
 
-	strcat_s(path, pathSize, DEFAULT_CONFIG_PATH);
+	strcat_s(path, pathSize, relativePath);
 	return true;
 }
 
