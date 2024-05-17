@@ -11,24 +11,28 @@ static constexpr char CONFIG_PATH[] = R"(\My Games\Fallout4\F4SE\AmmoRemover.ini
 
 static constexpr SInt32 AMMO_PERCENT_MAX = 1000;
 
-bool Config::Initialize(SInt32& ammoPercent, Logger::LogLevel& logLevel)
+Config::InitializeResult Config::Initialize(SInt32& ammoPercent, Logger::LogLevel& logLevel)
 {
 	char configPath[MAX_PATH];
 	if (!GetPath(configPath, MAX_PATH))
-		return false;
+		return Failed;
 
 	if (!Exists(configPath) || !Load(configPath, ammoPercent, logLevel))
 	{
 		char defaultConfigPath[MAX_PATH];
-		if (!GetDefaultPath(defaultConfigPath, MAX_PATH)
-			|| !Copy(defaultConfigPath, configPath)
-			|| !Load(configPath, ammoPercent, logLevel))
+		if (!GetDefaultPath(defaultConfigPath, MAX_PATH))
+			return Failed;
+
+		if (!Copy(defaultConfigPath, configPath) || !Load(configPath, ammoPercent, logLevel))
 		{
-			return false;
+			if (Load(defaultConfigPath, ammoPercent, logLevel))
+				return Defaults;
+
+			return Failed;
 		}
 	}
 
-	return true;
+	return ConfigFile;
 }
 
 bool Config::GetPath(char* path, const rsize_t pathSize)
@@ -62,15 +66,15 @@ bool Config::Load(const char* path, SInt32& ammoPercent, Logger::LogLevel& logLe
 	if (FAILED(iniReader.ParseError()))
 		return false;
 
-	const auto ammoPercentTemp = iniReader.GetInteger("Config", "Ammo Percent", -1);
-	if (ammoPercentTemp < 0 || ammoPercentTemp > AMMO_PERCENT_MAX)
+	const auto ammoPercentVal = iniReader.GetInteger("Config", "Ammo Percent", -1);
+	if (ammoPercentVal < 0 || ammoPercentVal > AMMO_PERCENT_MAX)
 		return false;
 
 	auto logLevelVal = iniReader.GetInteger("Config", "Log Level", -1);
 	if (logLevelVal < Logger::Fatal || logLevelVal > Logger::Debug)
 		return false;
 
-	ammoPercent = ammoPercentTemp;
+	ammoPercent = ammoPercentVal;
 	logLevel = static_cast<Logger::LogLevel>(logLevelVal);
 	return true;
 }

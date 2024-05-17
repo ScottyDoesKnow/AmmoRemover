@@ -47,9 +47,9 @@ extern "C"
 	{
 		SInt32 ammoPercent;
 		Logger::LogLevel logLevel;
-		const bool configInitialized = Config::Initialize(ammoPercent, logLevel);
+		const Config::InitializeResult configResult = Config::Initialize(ammoPercent, logLevel);
 
-		if (configInitialized)
+		if (configResult != Config::Failed)
 		{
 			TESDeathEventHandler::ammoPercent = ammoPercent;
 			Logger::logLevel = logLevel;
@@ -58,10 +58,20 @@ extern "C"
 		Logger::Initialize();
 		Logger::Log(Logger::Message, "Attempting to load v%s...", AMMO_REMOVER_VERSION);
 
-		if (configInitialized)
-			Logger::Log(Logger::Message, "Loaded %li%% ammo setting.", ammoPercent);
-		else
-			Logger::Log(Logger::Message, "Failed to load configuration, defaulting to %li%% ammo.", TESDeathEventHandler::ammoPercent);
+		switch (configResult)
+		{
+		case Config::Failed:
+			Logger::Log(Logger::Warning, "Failed to load any configuration, defaulting to %li%% Ammo Percent.",
+				TESDeathEventHandler::ammoPercent);
+			break;
+		case Config::ConfigFile:
+			Logger::Log(Logger::Message, "Loaded %li%% Ammo Percent.", ammoPercent);
+			break;
+		case Config::Defaults:
+			Logger::Log(Logger::Warning, "Failed to load AmmoRemover.ini, loaded %li%% Ammo Percent from AmmoRemoverDefaults.ini",
+				ammoPercent);
+			break;
+		}
 
 		if (f4se->isEditor)
 		{

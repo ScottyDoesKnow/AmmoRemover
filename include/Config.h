@@ -5,7 +5,14 @@
 class Config
 {
 public:
-	static bool Initialize(SInt32& ammoPercent, Logger::LogLevel& logLevel);
+	enum InitializeResult
+	{
+		Failed,
+		ConfigFile,
+		Defaults
+	};
+
+	static InitializeResult Initialize(SInt32& ammoPercent, Logger::LogLevel& logLevel);
 
 private:
 	static bool GetPath(char* path, rsize_t pathSize);
