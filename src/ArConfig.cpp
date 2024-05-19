@@ -1,4 +1,4 @@
-#include "Config.h"
+#include "ArConfig.h"
 
 #include <fstream>
 #include <ShlObj_core.h>
@@ -9,32 +9,38 @@
 static constexpr char DEFAULT_CONFIG_PATH[] = R"(\AmmoRemoverDefaults.ini)";
 static constexpr char CONFIG_PATH[] = R"(\My Games\Fallout4\F4SE\AmmoRemover.ini)";
 static constexpr char CONFIG_PATH_TRUE[] = R"(\My Games\Fallout4\F4SE\TrueAmmoRemover.ini)";
+static constexpr char CONFIG_PATH_TRUE2[] = R"(\My Games\Fallout4\F4SE\TrueTrueAmmoRemover.ini)";
 
 static constexpr SInt32 AMMO_PERCENT_MAX = 1000;
 
-Config::InitializeResult Config::Initialize(SInt32& ammoPercent, Logger::LogLevel& logLevel)
+ArConfig::InitializeResult ArConfig::Initialize(SInt32& wepAmmoPercent, SInt32& invAmmoPercent, ArLogger::LogLevel& logLevel)
 {
 	char defaultConfigPath[MAX_PATH];
-	if (!GetLocalPath(defaultConfigPath, MAX_PATH, DEFAULT_CONFIG_PATH) || !Load(defaultConfigPath, ammoPercent, logLevel))
+	if (!GetLocalPath(defaultConfigPath, MAX_PATH, DEFAULT_CONFIG_PATH)
+		|| !Load(defaultConfigPath, wepAmmoPercent, invAmmoPercent, logLevel))
+	{
 		return Failed;
+	}
+
+	const auto relativePath = wepAmmoPercent == 0 ? (invAmmoPercent == 0 ? CONFIG_PATH_TRUE2 : CONFIG_PATH_TRUE) : CONFIG_PATH;
 
 	char configPath[MAX_PATH];
-	if (!GetDocumentsPath(configPath, MAX_PATH, ammoPercent == 0 ? CONFIG_PATH_TRUE : CONFIG_PATH))
+	if (!GetDocumentsPath(configPath, MAX_PATH, relativePath))
 		return Defaults;
 
-	if (Exists(configPath) && Load(configPath, ammoPercent, logLevel))
+	if (Exists(configPath) && Load(configPath, wepAmmoPercent, invAmmoPercent, logLevel))
 		return ConfigFile;
 
-	if (Copy(defaultConfigPath, configPath) && Load(configPath, ammoPercent, logLevel))
+	if (Copy(defaultConfigPath, configPath) && Load(configPath, wepAmmoPercent, invAmmoPercent, logLevel))
 		return ConfigFile;
 
-	if (Load(defaultConfigPath, ammoPercent, logLevel))
+	if (Load(defaultConfigPath, wepAmmoPercent, invAmmoPercent, logLevel))
 		return Defaults;
 
 	return Failed;
 }
 
-bool Config::GetDocumentsPath(char* path, const rsize_t pathSize, const char* relativePath)
+bool ArConfig::GetDocumentsPath(char* path, const rsize_t pathSize, const char* relativePath)
 {
 	const HRESULT error = SHGetFolderPath(nullptr, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE,
 		nullptr, SHGFP_TYPE_CURRENT, path);
@@ -48,7 +54,7 @@ bool Config::GetDocumentsPath(char* path, const rsize_t pathSize, const char* re
 	return true;
 }
 
-bool Config::Exists(const char* path)
+bool ArConfig::Exists(const char* path)
 {
 	if (FILE* file = fopen(path, "r"))
 	{
@@ -59,26 +65,31 @@ bool Config::Exists(const char* path)
 	return false;
 }
 
-bool Config::Load(const char* path, SInt32& ammoPercent, Logger::LogLevel& logLevel)
+bool ArConfig::Load(const char* path, SInt32& wepAmmoPercent, SInt32& invAmmoPercent, ArLogger::LogLevel& logLevel)
 {
 	const auto iniReader = INIReader(path);
 	if (FAILED(iniReader.ParseError()))
 		return false;
 
-	const auto ammoPercentVal = iniReader.GetInteger("Config", "Ammo Percent", -1);
-	if (ammoPercentVal < 0 || ammoPercentVal > AMMO_PERCENT_MAX)
+	const auto wepVal = iniReader.GetInteger("Config", "Weapon Ammo %", -1);
+	if (wepVal < 0 || wepVal > AMMO_PERCENT_MAX)
 		return false;
 
-	auto logLevelVal = iniReader.GetInteger("Config", "Log Level", -1);
-	if (logLevelVal < Logger::Fatal || logLevelVal > Logger::Debug)
+	const auto invVal = iniReader.GetInteger("Config", "Inventory Ammo %", -1);
+	if (invVal < 0 || invVal > AMMO_PERCENT_MAX)
 		return false;
 
-	ammoPercent = ammoPercentVal;
-	logLevel = static_cast<Logger::LogLevel>(logLevelVal);
+	auto logVal = iniReader.GetInteger("Config", "Log Level", -1);
+	if (logVal < ArLogger::Fatal || logVal > ArLogger::Debug)
+		return false;
+
+	wepAmmoPercent = wepVal;
+	invAmmoPercent = invVal;
+	logLevel = static_cast<ArLogger::LogLevel>(logVal);
 	return true;
 }
 
-bool Config::GetLocalPath(char* path, const rsize_t pathSize, const char* relativePath)
+bool ArConfig::GetLocalPath(char* path, const rsize_t pathSize, const char* relativePath)
 {
 	HMODULE hModule;
 	if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
@@ -96,7 +107,7 @@ bool Config::GetLocalPath(char* path, const rsize_t pathSize, const char* relati
 	return true;
 }
 
-bool Config::Copy(const char* sourcePath, const char* destPath)
+bool ArConfig::Copy(const char* sourcePath, const char* destPath)
 {
 	const std::ifstream sourceFile(sourcePath, std::ios::binary);
 	if (!sourceFile)

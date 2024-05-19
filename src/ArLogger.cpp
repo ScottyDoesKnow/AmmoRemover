@@ -1,4 +1,4 @@
-#include "Logger.h"
+#include "ArLogger.h"
 
 #include <ShlObj_core.h>
 
@@ -13,9 +13,9 @@ static constexpr const char* PREFIX[] = {
 	R"(DEBUG   | )"
 };
 
-Logger::LogLevel Logger::logLevel = Message;
+ArLogger::LogLevel ArLogger::logLevel = Message;
 
-void Logger::Initialize()
+void ArLogger::Initialize()
 {
 	IDebugLog::OpenRelative(CSIDL_MYDOCUMENTS, LOG_PATH);
 	IDebugLog::SetPrintLevel(Convert(logLevel));
@@ -23,7 +23,7 @@ void Logger::Initialize()
 }
 
 
-void Logger::Log(const LogLevel level, const char* format, ...)
+void ArLogger::Log(const LogLevel level, const char* format, ...)
 {
 	if (level > logLevel)
 		return;
@@ -35,7 +35,7 @@ void Logger::Log(const LogLevel level, const char* format, ...)
 }
 
 
-void Logger::LogP(const LogLevel level, const char* prefix, const char* format, ...)
+void ArLogger::LogP(const LogLevel level, const char* prefix, const char* format, ...)
 {
 	if (level > logLevel)
 		return;
@@ -46,7 +46,7 @@ void Logger::LogP(const LogLevel level, const char* prefix, const char* format, 
 	va_end(args);
 }
 
-void Logger::LogInternal(const LogLevel level, const char* prefix, const char* format, const va_list args)
+void ArLogger::LogInternal(const LogLevel level, const char* prefix, const char* format, const va_list args)
 {
 	const UInt8 levelVal = static_cast<UInt8>(level);
 

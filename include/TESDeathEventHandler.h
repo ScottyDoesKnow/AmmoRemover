@@ -12,7 +12,8 @@ public:
 	TESDeathEventHandler& operator=(TESDeathEventHandler&&) = delete;
 	~TESDeathEventHandler() override = default;
 
-	static SInt32 ammoPercent;
+	static SInt32 wepAmmoPercent;
+	static SInt32 invAmmoPercent;
 
 	static TESDeathEventHandler* GetSingleton()
 	{
@@ -33,5 +34,5 @@ private:
 	TESDeathEventHandler() {}
 
 	static bool UnloadReloadAmmo(const Actor* actor, AmmoStack& ammoStack, bool unload);
-	static bool AddAmmo(const Actor* actor, AmmoStack ammoStack);
+	static bool SetAmmo(TESObjectREFR* source, const Actor* actor, const AmmoStack ammoStack);
 };

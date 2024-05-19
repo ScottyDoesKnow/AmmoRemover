@@ -4,8 +4,10 @@
 
 #include "f4se/GameReferences.h"
 #include "f4se/GameRTTI.h"
+#include "f4se/PapyrusEvents.h"
+#include "f4se/PapyrusUtilities.h"
 
-#include "Logger.h"
+#include "ArLogger.h"
 
 static constexpr UInt64 LOWER_32_MASK = 0x00000000FFFFFFFF;
 static constexpr UInt64 UPPER_32_MASK = 0xFFFFFFFF00000000;
@@ -14,9 +16,10 @@ static constexpr size_t CANT_DROP_FLAG_POS = 2;
 static constexpr char PREFIX_RE[] = R"(Event   | )";
 static constexpr char PREFIX_UA[] = R"(Unload  | )";
 static constexpr char PREFIX_RA[] = R"(Reload  | )";
-static constexpr char PREFIX_AA[] = R"(AddAmmo | )";
+static constexpr char PREFIX_SA[] = R"(SetAmmo | )";
 
-SInt32 TESDeathEventHandler::ammoPercent = 100;
+SInt32 TESDeathEventHandler::wepAmmoPercent = 100;
+SInt32 TESDeathEventHandler::invAmmoPercent = 100;
 
 EventResult TESDeathEventHandler::ReceiveEvent(TESDeathEvent* event, void* dispatcher)
 {
@@ -31,9 +34,9 @@ EventResult TESDeathEventHandler::ReceiveEvent(TESDeathEvent* event, void* dispa
 	if (!UnloadReloadAmmo(actor, ammoData, true))
 		return kEvent_Continue;
 
-	if (ammoPercent > 0 && !AddAmmo(actor, ammoData))
+	if ((wepAmmoPercent > 0 || invAmmoPercent != 100) && !SetAmmo(event->source, actor, ammoData))
 	{
-		Logger::LogP(Logger::Message, PREFIX_RE, "AddAmmo failed, attempting to reload...");
+		ArLogger::LogP(ArLogger::Message, PREFIX_RE, "SetAmmo failed, attempting to reload...");
 		UnloadReloadAmmo(actor, ammoData, false);
 	}
 
@@ -45,44 +48,44 @@ bool TESDeathEventHandler::UnloadReloadAmmo(const Actor* actor, AmmoStack& ammoS
 	const auto prefix = unload ? PREFIX_UA : PREFIX_RA;
 	const auto action = unload ? "unload" : "reload";
 
-	Logger::LogP(Logger::Verbose, prefix, "Attempting to %s ammo...", action);
+	ArLogger::LogP(ArLogger::Verbose, prefix, "Attempting to %s ammo...", action);
 
 	const auto middleProcess = actor->middleProcess;
 	if (!middleProcess)
 	{
-		Logger::LogP(Logger::Verbose, prefix, "Failed to get actor data.");
+		ArLogger::LogP(ArLogger::Verbose, prefix, "Failed to get actor data.");
 		return false;
 	}
 
 	const auto unk08 = middleProcess->unk08;
 	if (!unk08)
 	{
-		Logger::LogP(Logger::Verbose, prefix, "Failed to get EquipData array.");
+		ArLogger::LogP(ArLogger::Verbose, prefix, "Failed to get EquipData array.");
 		return false;
 	}
 
 	SimpleLocker locker(&unk08->lock);
 
-	const auto equipDataArray = unk08->equipData;
-	for (UInt32 i = 0; i < equipDataArray.count; ++i)
+	const auto equipDatas = unk08->equipData;
+	for (UInt32 i = 0; i < equipDatas.count; ++i)
 	{
 		Actor::MiddleProcess::Data08::EquipData equipData;
-		if (!equipDataArray.GetNthItem(i, equipData))
+		if (!equipDatas.GetNthItem(i, equipData))
 		{
-			Logger::LogP(Logger::Verbose, prefix, "Failed to get EquipData.");
+			ArLogger::LogP(ArLogger::Verbose, prefix, "Failed to get EquipData.");
 			return false; // If one fails, all the rest will fail
 		}
 
 		const auto item = equipData.item;
 		if (!item)
 		{
-			Logger::LogP(Logger::Debug, prefix, "Failed to get item.");
+			ArLogger::LogP(ArLogger::Debug, prefix, "Failed to get item.");
 			continue;
 		}
 
 		if (std::bitset<sizeof(UInt32) * CHAR_BIT>(item->flags).test(CANT_DROP_FLAG_POS))
 		{
-			Logger::LogP(Logger::Verbose, prefix, "%s (%lu) ignored due to 'Can't Drop' flag.",
+			ArLogger::LogP(ArLogger::Verbose, prefix, "%s (%lu) ignored due to 'Can't Drop' flag.",
 				item->GetFullName(), item->formID);
 			continue;
 		}
@@ -90,7 +93,7 @@ bool TESDeathEventHandler::UnloadReloadAmmo(const Actor* actor, AmmoStack& ammoS
 		const auto equippedData = equipData.equippedData;
 		if (!equippedData)
 		{
-			Logger::LogP(Logger::Debug, prefix, "%s (%lu) has no equippedData.",
+			ArLogger::LogP(ArLogger::Debug, prefix, "%s (%lu) has no equippedData.",
 				item->GetFullName(), item->formID);
 			continue;
 		}
@@ -98,7 +101,7 @@ bool TESDeathEventHandler::UnloadReloadAmmo(const Actor* actor, AmmoStack& ammoS
 		const auto ammo = equippedData->ammo;
 		if (!ammo)
 		{
-			Logger::LogP(Logger::Debug, prefix, "%s (%lu) has no ammo.",
+			ArLogger::LogP(ArLogger::Debug, prefix, "%s (%lu) has no ammo.",
 				item->GetFullName(), item->formID);
 			continue;
 		}
@@ -107,7 +110,7 @@ bool TESDeathEventHandler::UnloadReloadAmmo(const Actor* actor, AmmoStack& ammoS
 		const auto ammoCharge = ammo->data.health;
 		if (ammoCharge > 0)
 		{
-			Logger::LogP(Logger::Verbose, prefix, "%s (%lu) ignored due to having a charge (%hu).",
+			ArLogger::LogP(ArLogger::Verbose, prefix, "%s (%lu) ignored due to having a charge (%hu).",
 				ammo->GetFullName(), ammo->formID, ammoCharge);
 			continue;
 		}
@@ -115,7 +118,7 @@ bool TESDeathEventHandler::UnloadReloadAmmo(const Actor* actor, AmmoStack& ammoS
 		const auto ammoCount = static_cast<SInt32>(equippedData->unk18 & LOWER_32_MASK); // Ammo count is lower 32 bits
 		if (ammoCount < 0)
 		{
-			Logger::LogP(Logger::Verbose, prefix, "%s (%lu) ignored due to having negative ammo count (%li).",
+			ArLogger::LogP(ArLogger::Verbose, prefix, "%s (%lu) ignored due to having negative ammo count (%li).",
 				ammo->GetFullName(), ammo->formID, ammoCount);
 			continue;
 		}
@@ -124,11 +127,11 @@ bool TESDeathEventHandler::UnloadReloadAmmo(const Actor* actor, AmmoStack& ammoS
 		{
 			if (ammoCount == 0)
 			{
-				Logger::LogP(Logger::Verbose, prefix, "%s (%lu) ignored due to having ammo count of 0.");
+				ArLogger::LogP(ArLogger::Verbose, prefix, "%s (%lu) ignored due to having ammo count of 0.");
 				continue; // Sometimes this method gets called twice, this will skip it on subsequent calls
 			}
 
-			Logger::LogP(Logger::Verbose, prefix, "Unloading %lu %s (%lu).",
+			ArLogger::LogP(ArLogger::Verbose, prefix, "Unloading %lu %s (%lu).",
 				ammoCount, ammo->GetFullName(), ammo->formID);
 
 			// Unload ammo
@@ -143,19 +146,19 @@ bool TESDeathEventHandler::UnloadReloadAmmo(const Actor* actor, AmmoStack& ammoS
 		{
 			if (ammo != ammoStack.ammo)
 			{
-				Logger::LogP(Logger::Debug, prefix, "%s (%lu) skipped due to not matching desired %s (%lu).",
+				ArLogger::LogP(ArLogger::Debug, prefix, "%s (%lu) skipped due to not matching desired %s (%lu).",
 					ammo->GetFullName(), ammo->formID, ammoStack.ammo->GetFullName(), ammoStack.ammo->formID);
 				continue;
 			}
 
 			if (ammoCount != 0)
 			{
-				Logger::LogP(Logger::Verbose, prefix, "%s (%lu) ignored due to having ammo count other than 0 (%li).",
+				ArLogger::LogP(ArLogger::Verbose, prefix, "%s (%lu) ignored due to having ammo count other than 0 (%li).",
 					ammo->GetFullName(), ammo->formID, ammoCount);
 				continue;
 			}
 
-			Logger::LogP(Logger::Verbose, prefix, "Reloading %li %s (%lu).",
+			ArLogger::LogP(ArLogger::Verbose, prefix, "Reloading %li %s (%lu).",
 				ammoStack.count, ammo->GetFullName(), ammo->formID);
 
 			// Reload ammo
@@ -164,45 +167,58 @@ bool TESDeathEventHandler::UnloadReloadAmmo(const Actor* actor, AmmoStack& ammoS
 		}
 	}
 
-	Logger::LogP(Logger::Verbose, prefix, "Failed to find equippedData to %s.", action);
+	ArLogger::LogP(ArLogger::Verbose, prefix, "Failed to find equippedData to %s.", action);
 	return false;
 }
 
-bool TESDeathEventHandler::AddAmmo(const Actor* actor, const AmmoStack ammoStack)
+bool TESDeathEventHandler::SetAmmo(TESObjectREFR* source, const Actor* actor, const AmmoStack ammoStack)
 {
-	Logger::LogP(Logger::Verbose, PREFIX_AA, "Attempting to add ammo...");
+	ArLogger::LogP(ArLogger::Verbose, PREFIX_SA, "Attempting to set ammo...");
 
-	const auto inventoryList = actor->inventoryList;
-	if (!inventoryList)
+	const auto inventory = actor->inventoryList;
+	if (!inventory)
 	{
-		Logger::LogP(Logger::Verbose, PREFIX_AA, "Failed to get inventory.");
+		ArLogger::LogP(ArLogger::Verbose, PREFIX_SA, "Failed to get inventory.");
 		return false;
 	}
 
-	BSWriteLocker locker(&inventoryList->inventoryLock);
+	BSWriteLocker locker(&inventory->inventoryLock);
 
-	const auto inventoryItems = inventoryList->items;
-	for (UInt32 j = 0; j < inventoryItems.count; ++j)
+	auto items = inventory->items;
+	for (UInt32 i = 0; i < items.count; ++i)
 	{
 		BGSInventoryItem item;
-		if (!inventoryItems.GetNthItem(j, item))
+		if (!items.GetNthItem(i, item))
 		{
-			Logger::LogP(Logger::Verbose, PREFIX_AA, "Failed to get inventory item.");
+			ArLogger::LogP(ArLogger::Verbose, PREFIX_SA, "Failed to get inventory item.");
 			return false; // If one fails, all the rest will fail
 		}
 
 		if (item.form == ammoStack.ammo)
 		{
-			const SInt32 toAdd = ammoStack.count * ammoPercent / 100;
+			const SInt32 wepAmmo = ammoStack.count * wepAmmoPercent / 100;
+			const SInt32 invAmmo = item.stack->count * invAmmoPercent / 100;
+			const SInt32 total = wepAmmo + invAmmo;
 
-			Logger::LogP(Logger::Verbose, PREFIX_AA, "Adding %li (%li%% of %li) %s (%lu) to existing %li.",
-				toAdd, ammoPercent, ammoStack.count, ammoStack.ammo->GetFullName(), ammoStack.ammo->formID, item.stack->count);
+			ArLogger::LogP(ArLogger::Verbose, PREFIX_SA, "Setting %s (%lu) to %li. %li (%li%% of %li) from weapon and %li (%li%% of %li) from inventory.",
+				ammoStack.ammo->GetFullName(), ammoStack.ammo->formID, total,
+				wepAmmo, wepAmmoPercent, ammoStack.count,
+				invAmmo, invAmmoPercent, item.stack->count);
 
-			item.stack->count += toAdd;
+			if (total > 0)
+				item.stack->count = total;
+			else
+			{
+				const auto handle = PapyrusVM::GetHandleFromObject(static_cast<void*>(source), TESObjectREFR::kTypeID);
+				bool silent = true;
+				TESObjectREFR* target = nullptr;
+				SendPapyrusEvent4<TESForm*, SInt32, bool, TESObjectREFR*>(handle, "ObjectReference", "RemoveItem", item.form, item.stack->count, silent, target);
+			}
+
 			return true;
 		}
 	}
 
-	Logger::LogP(Logger::Verbose, PREFIX_AA, "Failed to find ammo.");
+	ArLogger::LogP(ArLogger::Verbose, PREFIX_SA, "Failed to find ammo.");
 	return false;
 }

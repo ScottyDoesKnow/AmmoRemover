@@ -31,7 +31,8 @@ cmake --build f4se/build --config Release
 Modify the path in CustomMacros.props to point to your Fallout 4 directory (mind the trailing backslash), then enable the Post-Build Event on the AmmoRemover project to have it copy AmmoRemover.dll and AmmoRemoverDefaults.ini to \<your Fallout 4 directory>\Data\F4SE\Plugins on successful build.
 
 ### Notes
+- DO NOT CLEAN EVER! Or you'll have to run the cmake commands again.
 - The AmmoRemover project points to f4se_1_10_984.lib in Properties -> Linker -> Input, which will need to be updated for future versions of F4SE.
-- The other solution configurations don't build, I assume you need to run the cmake commands with different --config values for that but haven't tried.
+- The other solution configurations don't build unless you delete all the folders other than AmmoRemover and run the commands (other than git clone AmmoRemover) with different --config values. I've only tried Debug and Release.
 - The cmake commands hardcode some values, so it'll break if you move or rename your directory.
 - I haven't touched INSTALL or ZERO_CHECK to see what they do.

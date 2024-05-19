@@ -12,10 +12,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Config.cpp">
+    <ClCompile Include="src\ArConfig.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="src\Logger.cpp">
+    <ClCompile Include="src\ArLogger.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\main.cpp">
@@ -26,13 +26,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="include\Config.h">
+    <ClInclude Include="include\ArConfig.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\INIReader.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="include\Logger.h">
+    <ClInclude Include="include\ArLogger.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\TESDeathEventHandler.h">

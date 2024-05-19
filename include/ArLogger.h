@@ -1,6 +1,6 @@
 #pragma once
 
-class Logger
+class ArLogger
 {
 public:
 	enum LogLevel
