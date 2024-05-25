@@ -111,7 +111,7 @@
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)../extern/lib/commond.lib;../f4se/build/f4se/$(Configuration)/f4se_1_10_984.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)../extern/lib/commond.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -156,7 +156,7 @@ echo F|copy /Y "$(TargetDir)AmmoRemoverDefaults.ini" "$(FalloutDir)Data\F4SE\Plu
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;../f4se/build/f4se/$(Configuration)/f4se_1_10_984.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -200,7 +200,7 @@ echo F|copy /Y "$(TargetDir)AmmoRemoverDefaults.ini" "$(FalloutDir)Data\F4SE\Plu
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;../f4se/build/f4se/$(Configuration)/f4se_1_10_984.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
     </Link>
@@ -240,7 +240,7 @@ echo F|copy /Y "$(TargetDir)AmmoRemoverDefaults.ini" "$(FalloutDir)Data\F4SE\Plu
       <UseFullPaths>false</UseFullPaths>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;../f4se/build/f4se/$(Configuration)/f4se_1_10_984.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(SolutionDir)../extern/lib/common.lib;shlwapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
       <SubSystem>Windows</SubSystem>
     </Link>

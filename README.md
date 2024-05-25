@@ -32,7 +32,6 @@ Modify the path in CustomMacros.props to point to your Fallout 4 directory (mind
 
 ### Notes
 - DO NOT CLEAN EVER! Or you'll have to run the cmake commands again.
-- The AmmoRemover project points to f4se_1_10_984.lib in Properties -> Linker -> Input, which will need to be updated for future versions of F4SE.
 - The other solution configurations don't build unless you delete all the folders other than AmmoRemover and run the commands (other than git clone AmmoRemover) with different --config values. I've only tried Debug and Release.
 - The cmake commands hardcode some values, so it'll break if you move or rename your directory.
 - I haven't touched INSTALL or ZERO_CHECK to see what they do.
