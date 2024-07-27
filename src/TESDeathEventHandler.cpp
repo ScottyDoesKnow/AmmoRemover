@@ -69,7 +69,7 @@ bool TESDeathEventHandler::UnloadReloadAmmo(const Actor* actor, AmmoStack& ammoS
 	const auto equipDatas = unk08->equipData;
 	for (UInt32 i = 0; i < equipDatas.count; ++i)
 	{
-		Actor::MiddleProcess::Data08::EquipData equipData;
+		Actor::AIProcess::Data08::EquipData equipData;
 		if (!equipDatas.GetNthItem(i, equipData))
 		{
 			ArLogger::LogP(ArLogger::Verbose, prefix, "Failed to get EquipData.");
