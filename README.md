@@ -37,21 +37,7 @@ Modify the path in CustomMacros.props to point to your Fallout 4 directory (mind
 - I haven't touched INSTALL or ZERO_CHECK to see what they do.
 
 ### Troubleshooting
-If you run into build errors, it could be due to changes to F4SE. To fix this:
+If you get the error "This project cannot build given the current state of the project." while trying to build ALL_BUILD, it's related to project GUIDs not updating. Closing and reopening Visual Studio seems to fix it.
 
-1. Open a Command Prompt window, browse to \<your directory>\common and run:
-
-```
-git reset --hard 66149ee
-```
-
-2. Browse to \<your directory>\f4se and run:
-
-```
-git reset --hard b7a144c
-```
-
-3. Browse to \<your directory> and run the cmake commands again.
-4. Follow the steps in the Building section from step 2 onwards.
-
-If this works, feel free to create an issue letting me know.
+### Testing
+This is just here for me because I always forget the commands. Type "player.placeatme 000769FE" in the console to spawn a Brotherhood Initiate.

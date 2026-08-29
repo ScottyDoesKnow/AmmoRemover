@@ -30,14 +30,14 @@ EventResult TESDeathEventHandler::ReceiveEvent(TESDeathEvent* event, void* dispa
 	if (!actor)
 		return kEvent_Continue;
 
-	AmmoStack ammoData;
-	if (!UnloadReloadAmmo(actor, ammoData, true))
+	AmmoStack ammoStack;
+	if (!UnloadReloadAmmo(actor, ammoStack, true))
 		return kEvent_Continue;
 
-	if ((wepAmmoPercent > 0 || invAmmoPercent != 100) && !SetAmmo(event->source, actor, ammoData))
+	if ((wepAmmoPercent > 0 || invAmmoPercent != 100) && !SetAmmo(event->source, actor, ammoStack))
 	{
 		ArLogger::LogP(ArLogger::Message, PREFIX_RE, "SetAmmo failed, attempting to reload...");
-		UnloadReloadAmmo(actor, ammoData, false);
+		UnloadReloadAmmo(actor, ammoStack, false);
 	}
 
 	return kEvent_Continue;
